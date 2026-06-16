@@ -1,8 +1,10 @@
 "use client";
 
 import { use } from "react";
+import { useRouter } from "next/navigation";
 import { useRoom } from "@/hooks/use-room";
 import { useTimer } from "@/hooks/use-timer";
+import { supabase } from "@/lib/supabase";
 import { WaitingRoom } from "@/components/phases/waiting-room";
 import { ReadHU } from "@/components/phases/read-hu";
 import { CreateTasks } from "@/components/phases/create-tasks";
@@ -12,9 +14,11 @@ import { RealComparison } from "@/components/phases/real-comparison";
 import { Finished } from "@/components/phases/finished";
 import { FacilitatorControls } from "@/components/facilitator-controls";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params);
+  const router = useRouter();
   const { room, participants, tasks, reviews, loading } = useRoom(code);
   const { display, remaining } = useTimer(room?.timer_end_at ?? null);
 
@@ -23,6 +27,22 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
 
   const participantId = typeof window !== "undefined" ? sessionStorage.getItem("participant_id") : null;
   const isFacilitator = typeof window !== "undefined" ? sessionStorage.getItem("is_facilitator") === "true" : false;
+
+  const handleDeleteRoom = async () => {
+    if (!confirm("¿Eliminar esta sala? Se perderán todos los datos.")) return;
+    await supabase.from("rooms").delete().eq("id", room.id);
+    sessionStorage.clear();
+    router.push("/");
+  };
+
+  const handleLeaveRoom = async () => {
+    if (!confirm("¿Salir de esta sala?")) return;
+    if (participantId) {
+      await supabase.from("participants").delete().eq("id", participantId);
+    }
+    sessionStorage.clear();
+    router.push("/");
+  };
 
   const phaseLabels: Record<string, string> = {
     WAITING_ROOM: "Sala de espera",
@@ -48,12 +68,23 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
             </div>
           </div>
         </div>
-        {room.timer_end_at && remaining > 0 && (
-          <div className="flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-lg">
-            <span className="text-sm font-medium">⏱</span>
-            <span className="text-xl font-bold font-mono">{display}</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {room.timer_end_at && remaining > 0 && (
+            <div className="flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-lg">
+              <span className="text-sm font-medium">⏱</span>
+              <span className="text-xl font-bold font-mono">{display}</span>
+            </div>
+          )}
+          {isFacilitator ? (
+            <Button size="sm" variant="destructive" onClick={handleDeleteRoom} className="text-xs">
+              🗑️ Eliminar sala
+            </Button>
+          ) : (
+            <Button size="sm" variant="ghost" onClick={handleLeaveRoom} className="text-xs text-muted-foreground">
+              Salir
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Facilitator Controls */}
