@@ -50,7 +50,10 @@ export function useRoom(code: string) {
       channel = supabase
         .channel(`room-${roomData.id}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomData.id}` },
-          (payload) => { if (payload.new) setRoom(payload.new as Room); }
+          (payload) => {
+            if (payload.eventType === "DELETE") { setRoom(null); }
+            else if (payload.new) { setRoom(payload.new as Room); }
+          }
         )
         .on("postgres_changes", { event: "*", schema: "public", table: "participants", filter: `room_id=eq.${roomData.id}` },
           () => { fetchParticipants(roomData.id); }

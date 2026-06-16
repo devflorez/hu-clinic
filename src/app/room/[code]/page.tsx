@@ -23,7 +23,14 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const { display, remaining } = useTimer(room?.timer_end_at ?? null);
 
   if (loading) return <div className="flex flex-1 items-center justify-center text-muted-foreground">Cargando...</div>;
-  if (!room) return <div className="flex flex-1 items-center justify-center text-muted-foreground">Sala no encontrada</div>;
+  if (!room) {
+    // Room was deleted — redirect participants to home
+    if (typeof window !== "undefined") {
+      sessionStorage.clear();
+      window.location.href = "/";
+    }
+    return <div className="flex flex-1 items-center justify-center text-muted-foreground">La sala fue eliminada. Redirigiendo...</div>;
+  }
 
   const participantId = typeof window !== "undefined" ? sessionStorage.getItem("participant_id") : null;
   const isFacilitator = typeof window !== "undefined" ? sessionStorage.getItem("is_facilitator") === "true" : false;
