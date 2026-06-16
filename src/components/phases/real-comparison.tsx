@@ -41,8 +41,9 @@ export function RealComparison({ room, tasks, participants, isFacilitator }: {
 
   if (realItems.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-6">
+      <Card className="shadow-sm">
+        <CardContent className="py-10 text-center">
+          <div className="text-4xl mb-3">📭</div>
           <p className="text-muted-foreground">No se configuraron ítems reales para comparar.</p>
         </CardContent>
       </Card>
@@ -50,44 +51,54 @@ export function RealComparison({ room, tasks, participants, isFacilitator }: {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card><CardContent className="py-4 text-center">
-          <div className="text-2xl font-bold text-green-600">{summary.covered.length}</div>
-          <div className="text-xs text-muted-foreground">Ítems cubiertos</div>
-        </CardContent></Card>
-        <Card><CardContent className="py-4 text-center">
-          <div className="text-2xl font-bold text-yellow-600">{summary.partial.length}</div>
-          <div className="text-xs text-muted-foreground">Parcialmente</div>
-        </CardContent></Card>
-        <Card><CardContent className="py-4 text-center">
-          <div className="text-2xl font-bold text-red-600">{summary.uncovered.length}</div>
-          <div className="text-xs text-muted-foreground">No identificados</div>
-        </CardContent></Card>
-        <Card><CardContent className="py-4 text-center">
-          <div className="text-2xl font-bold text-gray-600">{summary.unnecessary.length}</div>
-          <div className="text-xs text-muted-foreground">Tareas sin match</div>
-        </CardContent></Card>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="shadow-sm">
+          <CardContent className="py-5 text-center">
+            <div className="text-3xl font-bold text-green-600">{summary.covered.length}</div>
+            <div className="text-xs text-muted-foreground mt-1">Ítems cubiertos</div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="py-5 text-center">
+            <div className="text-3xl font-bold text-yellow-600">{summary.partial.length}</div>
+            <div className="text-xs text-muted-foreground mt-1">Parcialmente</div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="py-5 text-center">
+            <div className="text-3xl font-bold text-red-600">{summary.uncovered.length}</div>
+            <div className="text-xs text-muted-foreground mt-1">No identificados</div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-sm">
+          <CardContent className="py-5 text-center">
+            <div className="text-3xl font-bold text-muted-foreground">{summary.unnecessary.length}</div>
+            <div className="text-xs text-muted-foreground mt-1">Tareas sin match</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Matching matrix */}
       {isFacilitator && (
-        <Card>
-          <CardHeader><CardTitle className="text-base">Mapeo: ítems reales → tareas propuestas</CardTitle></CardHeader>
-          <CardContent className="flex flex-col gap-4">
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">🔗 Mapeo: ítems reales → tareas propuestas</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
             {realItems.map((item) => (
-              <div key={item.id} className="border rounded p-3">
-                <div className="font-medium mb-2">{item.title}</div>
-                {item.description && <p className="text-sm text-muted-foreground mb-2">{item.description}</p>}
-                <div className="flex flex-col gap-1">
+              <div key={item.id} className="border rounded-xl p-4 bg-accent/30">
+                <div className="font-semibold mb-1">{item.title}</div>
+                {item.description && <p className="text-sm text-muted-foreground mb-3">{item.description}</p>}
+                <div className="flex flex-col gap-2">
                   {tasks.slice(0, 20).map((task) => {
                     const match = matches.find((m) => m.real_item_id === item.id && m.task_id === task.id);
                     return (
-                      <div key={task.id} className="flex items-center gap-2 text-sm">
+                      <div key={task.id} className="flex items-center gap-3 text-sm bg-card rounded-lg px-3 py-2">
                         <span className="flex-1 truncate">{task.title} <span className="text-muted-foreground">({participants.find(p => p.id === task.participant_id)?.name})</span></span>
                         <Select value={match?.coverage || "none"} onValueChange={(v) => setMatch(item.id, task.id, v as "full" | "partial" | "none")}>
-                          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                          <SelectTrigger className="w-36"><SelectValue /></SelectTrigger>
                           <SelectContent>
                             <SelectItem value="full">✅ Cubre</SelectItem>
                             <SelectItem value="partial">🟡 Parcial</SelectItem>
@@ -106,18 +117,20 @@ export function RealComparison({ room, tasks, participants, isFacilitator }: {
 
       {/* Results for everyone */}
       {!isFacilitator && (
-        <Card>
-          <CardHeader><CardTitle className="text-base">Resumen de comparación</CardTitle></CardHeader>
-          <CardContent className="flex flex-col gap-3">
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">📊 Resumen de comparación</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
             <div>
-              <h4 className="font-medium text-green-700 mb-1">✅ Ítems cubiertos</h4>
-              {summary.covered.map((i) => <div key={i.id} className="text-sm ml-2">{i.title}</div>)}
-              {summary.covered.length === 0 && <p className="text-sm text-muted-foreground ml-2">Ninguno aún</p>}
+              <h4 className="font-semibold text-sm text-green-700 mb-2">✅ Ítems cubiertos</h4>
+              {summary.covered.map((i) => <div key={i.id} className="text-sm ml-4 py-1">{i.title}</div>)}
+              {summary.covered.length === 0 && <p className="text-sm text-muted-foreground ml-4">Ninguno aún</p>}
             </div>
             <div>
-              <h4 className="font-medium text-red-700 mb-1">❌ Ítems no identificados</h4>
-              {summary.uncovered.map((i) => <div key={i.id} className="text-sm ml-2">{i.title}</div>)}
-              {summary.uncovered.length === 0 && <p className="text-sm text-muted-foreground ml-2">¡Todos cubiertos!</p>}
+              <h4 className="font-semibold text-sm text-red-700 mb-2">❌ Ítems no identificados</h4>
+              {summary.uncovered.map((i) => <div key={i.id} className="text-sm ml-4 py-1">{i.title}</div>)}
+              {summary.uncovered.length === 0 && <p className="text-sm text-muted-foreground ml-4">¡Todos cubiertos!</p>}
             </div>
           </CardContent>
         </Card>

@@ -10,14 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-function getAssignments(participants: Participant[], currentId: string): string[] {
-  // Assign each participant 2-3 other participants' boards to review
-  const others = participants.filter((p) => p.id !== currentId && !p.is_facilitator);
-  // Simple round-robin: take up to 3
-  const shuffled = [...others].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(3, shuffled.length)).map((p) => p.id);
-}
-
 export function ReviewPhase({ room, participants, tasks, reviews, participantId }: {
   room: Room; participants: Participant[]; tasks: Task[]; reviews: Review[]; participantId: string | null;
 }) {
@@ -27,12 +19,10 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [submittedReviews, setSubmittedReviews] = useState<Set<string>>(new Set());
 
-  // Generate stable assignments using a seed based on participant ID
   useEffect(() => {
     if (!participantId) return;
     const nonFacilitators = participants.filter((p) => !p.is_facilitator);
     const others = nonFacilitators.filter((p) => p.id !== participantId);
-    // Deterministic assignment: use participantId char codes as seed
     const seed = participantId.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
     const sorted = [...others].sort((a, b) => {
       const ha = (a.id.charCodeAt(0) + seed) % 100;
@@ -44,7 +34,6 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
     if (assigned.length > 0) setSelectedBoard(assigned[0]);
   }, [participantId, participants]);
 
-  // Track submitted reviews
   useEffect(() => {
     if (!participantId) return;
     const myReviews = reviews.filter((r) => r.reviewer_id === participantId);
@@ -76,53 +65,59 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
   const isFacilitator = participants.find((p) => p.id === participantId)?.is_facilitator;
   if (isFacilitator) {
     return (
-      <Card>
-        <CardContent className="py-6">
+      <Card className="shadow-sm">
+        <CardContent className="py-8 text-center">
+          <div className="text-4xl mb-3">👀</div>
           <p className="text-muted-foreground">Los participantes están revisando las tareas de otros tableros...</p>
-          <p className="mt-2">Reviews completadas: {reviews.length}</p>
+          <p className="mt-3 text-2xl font-bold">{reviews.length}</p>
+          <p className="text-xs text-muted-foreground">Reviews completadas</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       {/* Board selector */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-3 flex-wrap">
         {assignments.map((pid) => {
           const p = participants.find((x) => x.id === pid);
           const boardDone = tasks.filter((t) => t.participant_id === pid).every((t) => submittedReviews.has(t.id));
           return (
             <Button key={pid} variant={selectedBoard === pid ? "default" : "outline"} size="sm"
-              onClick={() => { setSelectedBoard(pid); setCurrentTaskIndex(0); }}>
-              {p?.name || "?"} {boardDone && "✓"}
+              onClick={() => { setSelectedBoard(pid); setCurrentTaskIndex(0); }}
+              className="gap-2">
+              {p?.name || "?"} {boardDone && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">✓</Badge>}
             </Button>
           );
         })}
       </div>
 
       {selectedBoard && boardTasks.length > 0 && currentTask && (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-5">
           {/* Task being reviewed */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">
-                Tablero de {boardOwner?.name} — Tarea {currentTaskIndex + 1}/{boardTasks.length}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">{currentTask.title}</span>
-                <Badge variant="outline">{currentTask.type}</Badge>
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Tablero de {boardOwner?.name}</CardTitle>
+                <Badge variant="secondary" className="text-xs">Tarea {currentTaskIndex + 1}/{boardTasks.length}</Badge>
               </div>
-              {currentTask.description && <p className="text-sm">{currentTask.description}</p>}
-              {currentTask.dependencies && <p className="text-xs text-muted-foreground">Dependencias: {currentTask.dependencies}</p>}
-              {currentTask.done_criteria && <p className="text-xs text-muted-foreground">Criterio: {currentTask.done_criteria}</p>}
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <div className="bg-accent/50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-semibold text-[15px]">{currentTask.title}</span>
+                  <Badge variant="outline" className="text-xs">{currentTask.type}</Badge>
+                </div>
+                {currentTask.description && <p className="text-sm leading-relaxed">{currentTask.description}</p>}
+                {currentTask.dependencies && <p className="text-xs text-muted-foreground mt-2">🔗 {currentTask.dependencies}</p>}
+                {currentTask.done_criteria && <p className="text-xs text-muted-foreground mt-1">✓ {currentTask.done_criteria}</p>}
+              </div>
 
-              <div className="flex gap-1 mt-2">
+              <div className="flex gap-1.5 flex-wrap">
                 {boardTasks.map((_, i) => (
-                  <Button key={i} size="sm" variant={i === currentTaskIndex ? "default" : "ghost"}
-                    onClick={() => setCurrentTaskIndex(i)} className="w-8 h-8 p-0">
+                  <Button key={i} size="sm" variant={i === currentTaskIndex ? "default" : "outline"}
+                    onClick={() => setCurrentTaskIndex(i)} className="w-9 h-9 p-0 text-xs font-medium">
                     {submittedReviews.has(boardTasks[i].id) ? "✓" : i + 1}
                   </Button>
                 ))}
@@ -131,52 +126,55 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
           </Card>
 
           {/* Review form */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Tu revisión</CardTitle>
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">📝 Tu revisión</CardTitle>
             </CardHeader>
             <CardContent>
               {submittedReviews.has(currentTask.id) ? (
-                <p className="text-green-600 font-medium">✓ Ya revisaste esta tarea</p>
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl mb-3">✓</div>
+                  <p className="text-green-700 font-medium">Ya revisaste esta tarea</p>
+                </div>
               ) : (
-                <div className="flex flex-col gap-3">
-                  <div>
+                <div className="flex flex-col gap-4">
+                  <div className="space-y-2">
                     <Label>¿Se entiende la tarea? (Claridad 1-5)</Label>
                     <Select value={String(reviewForm.clarity)} onValueChange={(v) => setReviewForm({ ...reviewForm, clarity: Number(v) })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {[1, 2, 3, 4, 5].map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label>¿Es necesaria?</Label>
                     <Select value={reviewForm.is_necessary ? "yes" : "no"} onValueChange={(v) => setReviewForm({ ...reviewForm, is_necessary: v === "yes" })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="yes">Sí</SelectItem>
                         <SelectItem value="no">No</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label>¿Está bien detallada? (Detalle 1-5)</Label>
                     <Select value={String(reviewForm.detail)} onValueChange={(v) => setReviewForm({ ...reviewForm, detail: Number(v) })}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {[1, 2, 3, 4, 5].map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label>¿La harías así o tomarías otro camino?</Label>
-                    <Textarea rows={2} value={reviewForm.alternative_approach} onChange={(e) => setReviewForm({ ...reviewForm, alternative_approach: e.target.value })} />
+                    <Textarea rows={2} value={reviewForm.alternative_approach} onChange={(e) => setReviewForm({ ...reviewForm, alternative_approach: e.target.value })} className="resize-none" />
                   </div>
-                  <div>
+                  <div className="space-y-2">
                     <Label>Comentario (opcional)</Label>
-                    <Textarea rows={2} value={reviewForm.comment} onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })} />
+                    <Textarea rows={2} value={reviewForm.comment} onChange={(e) => setReviewForm({ ...reviewForm, comment: e.target.value })} className="resize-none" />
                   </div>
-                  <Button onClick={submitReview}>Enviar revisión</Button>
+                  <Button onClick={submitReview} size="lg" className="h-11 font-semibold mt-1">Enviar revisión</Button>
                 </div>
               )}
             </CardContent>
@@ -185,7 +183,11 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
       )}
 
       {selectedBoard && boardTasks.length === 0 && (
-        <p className="text-muted-foreground">Este participante no creó tareas.</p>
+        <Card className="shadow-sm">
+          <CardContent className="py-8 text-center">
+            <p className="text-muted-foreground">Este participante no creó tareas.</p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

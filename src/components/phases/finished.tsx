@@ -13,22 +13,27 @@ const QUESTIONS = [
 
 export function Finished() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>🎉 Dinámica finalizada</CardTitle>
+    <Card className="shadow-sm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-xl">🎉 Dinámica finalizada</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
-        <p className="text-muted-foreground">
+      <CardContent className="flex flex-col gap-6">
+        <p className="text-muted-foreground leading-relaxed">
           Gracias por participar. Discutan en equipo las siguientes preguntas de cierre:
         </p>
-        <ol className="list-decimal list-inside flex flex-col gap-3">
+        <ol className="flex flex-col gap-4">
           {QUESTIONS.map((q, i) => (
-            <li key={i} className="text-sm leading-relaxed">{q}</li>
+            <li key={i} className="flex items-start gap-3">
+              <span className="shrink-0 w-7 h-7 bg-primary/10 rounded-full flex items-center justify-center text-xs font-bold text-primary">{i + 1}</span>
+              <span className="text-sm leading-relaxed pt-1">{q}</span>
+            </li>
           ))}
         </ol>
-        <p className="text-sm text-muted-foreground mt-4">
-          💡 Usen estas reflexiones para mejorar la próxima descomposición de HU en su equipo.
-        </p>
+        <div className="bg-accent/50 rounded-xl p-5 mt-2">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            💡 Usen estas reflexiones para mejorar la próxima descomposición de HU en su equipo.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

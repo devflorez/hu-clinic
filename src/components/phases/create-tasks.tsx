@@ -42,63 +42,72 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
   };
 
   return (
-    <div className="grid md:grid-cols-2 gap-4">
+    <div className="grid md:grid-cols-2 gap-6">
       {/* Form */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Agregar tarea</CardTitle>
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-base">✏️ Agregar tarea</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={addTask} className="flex flex-col gap-3">
-            <div>
+          <form onSubmit={addTask} className="flex flex-col gap-4">
+            <div className="space-y-2">
               <Label htmlFor="task-title">Título</Label>
-              <Input id="task-title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+              <Input id="task-title" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="h-11" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="task-desc">Descripción</Label>
-              <Textarea id="task-desc" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              <Textarea id="task-desc" rows={2} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="resize-none" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label>Tipo</Label>
               <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as TaskType })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {TASK_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="task-deps">Dependencias</Label>
-              <Input id="task-deps" value={form.dependencies} onChange={(e) => setForm({ ...form, dependencies: e.target.value })} placeholder="Ej: login, base de datos" />
+              <Input id="task-deps" value={form.dependencies} onChange={(e) => setForm({ ...form, dependencies: e.target.value })} placeholder="Ej: login, base de datos" className="h-11" />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="task-done">Criterio de terminado</Label>
-              <Textarea id="task-done" rows={2} value={form.done_criteria} onChange={(e) => setForm({ ...form, done_criteria: e.target.value })} />
+              <Textarea id="task-done" rows={2} value={form.done_criteria} onChange={(e) => setForm({ ...form, done_criteria: e.target.value })} className="resize-none" />
             </div>
-            <Button type="submit">Agregar</Button>
+            <Button type="submit" size="lg" className="h-11 font-semibold mt-1">Agregar tarea</Button>
           </form>
         </CardContent>
       </Card>
 
       {/* My tasks list */}
-      <div className="flex flex-col gap-2">
-        <h3 className="font-medium">Mis tareas ({myTasks.length})</h3>
+      <div className="flex flex-col gap-3">
+        <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">
+          Mis tareas ({myTasks.length})
+        </h3>
         {myTasks.map((task) => (
-          <Card key={task.id}>
-            <CardContent className="py-3 flex flex-col gap-1">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{task.title}</span>
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline">{task.type}</Badge>
-                  <Button size="sm" variant="ghost" onClick={() => deleteTask(task.id)}>✕</Button>
+          <Card key={task.id} className="shadow-sm">
+            <CardContent className="py-4 px-5 flex flex-col gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <span className="font-semibold text-[15px] leading-tight">{task.title}</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge variant="outline" className="text-xs">{task.type}</Badge>
+                  <Button size="sm" variant="ghost" onClick={() => deleteTask(task.id)} className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive">✕</Button>
                 </div>
               </div>
-              {task.description && <p className="text-sm text-muted-foreground">{task.description}</p>}
+              {task.description && <p className="text-sm text-muted-foreground leading-relaxed">{task.description}</p>}
+              {task.dependencies && <p className="text-xs text-muted-foreground">🔗 {task.dependencies}</p>}
               {task.done_criteria && <p className="text-xs text-muted-foreground">✓ {task.done_criteria}</p>}
             </CardContent>
           </Card>
         ))}
-        {myTasks.length === 0 && <p className="text-muted-foreground text-sm">Aún no has creado tareas.</p>}
+        {myTasks.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="text-4xl mb-3">📝</div>
+            <p className="text-muted-foreground text-sm">Aún no has creado tareas.</p>
+            <p className="text-muted-foreground text-xs mt-1">Usa el formulario para agregar tu primera tarea.</p>
+          </div>
+        )}
       </div>
     </div>
   );
