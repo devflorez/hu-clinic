@@ -130,4 +130,18 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-montserrat);
   }
+  /* Accessibility: make clickable elements obvious */
+  button, [role="button"], a, [tabindex="0"] {
+    @apply cursor-pointer;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    @apply hover:brightness-95 active:scale-[0.98] transition-all duration-150;
+  }
+  a:not([class]) {
+    @apply text-primary underline underline-offset-2 hover:text-primary/80;
+  }
+  /* Focus visible for all interactive elements */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
 }
