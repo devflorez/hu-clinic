@@ -18,8 +18,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const { room, participants, tasks, reviews, loading } = useRoom(code);
   const { display, remaining } = useTimer(room?.timer_end_at ?? null);
 
-  if (loading) return <div className="flex flex-1 items-center justify-center">Cargando...</div>;
-  if (!room) return <div className="flex flex-1 items-center justify-center">Sala no encontrada</div>;
+  if (loading) return <div className="flex flex-1 items-center justify-center text-muted-foreground">Cargando...</div>;
+  if (!room) return <div className="flex flex-1 items-center justify-center text-muted-foreground">Sala no encontrada</div>;
 
   const participantId = typeof window !== "undefined" ? sessionStorage.getItem("participant_id") : null;
   const isFacilitator = typeof window !== "undefined" ? sessionStorage.getItem("is_facilitator") === "true" : false;
@@ -35,16 +35,24 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   };
 
   return (
-    <div className="flex flex-col flex-1 p-4 gap-4 max-w-6xl mx-auto w-full">
+    <div className="flex flex-col flex-1 p-6 md:p-8 gap-6 max-w-6xl mx-auto w-full">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold">🏥 {room.title}</h1>
-          <Badge variant="secondary">Código: {room.code}</Badge>
-          <Badge>{phaseLabels[room.current_phase] || room.current_phase}</Badge>
+      <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-lg">🏥</div>
+          <div>
+            <h1 className="text-lg font-bold leading-tight">{room.title}</h1>
+            <div className="flex items-center gap-2 mt-1">
+              <Badge variant="secondary" className="text-xs font-mono">{room.code}</Badge>
+              <Badge className="text-xs">{phaseLabels[room.current_phase] || room.current_phase}</Badge>
+            </div>
+          </div>
         </div>
         {room.timer_end_at && remaining > 0 && (
-          <Badge variant="destructive" className="text-base px-3 py-1">⏱ {display}</Badge>
+          <div className="flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-lg">
+            <span className="text-sm font-medium">⏱</span>
+            <span className="text-xl font-bold font-mono">{display}</span>
+          </div>
         )}
       </div>
 
@@ -52,13 +60,15 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       {isFacilitator && <FacilitatorControls room={room} />}
 
       {/* Phase Content */}
-      {room.current_phase === "WAITING_ROOM" && <WaitingRoom room={room} participants={participants} />}
-      {room.current_phase === "READ_HU" && <ReadHU room={room} />}
-      {room.current_phase === "CREATE_TASKS" && <CreateTasks room={room} participantId={participantId} />}
-      {room.current_phase === "REVIEW" && <ReviewPhase room={room} participants={participants} tasks={tasks} reviews={reviews} participantId={participantId} />}
-      {room.current_phase === "RESULTS" && <Results tasks={tasks} reviews={reviews} participants={participants} />}
-      {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} />}
-      {room.current_phase === "FINISHED" && <Finished />}
+      <div className="flex-1">
+        {room.current_phase === "WAITING_ROOM" && <WaitingRoom room={room} participants={participants} />}
+        {room.current_phase === "READ_HU" && <ReadHU room={room} />}
+        {room.current_phase === "CREATE_TASKS" && <CreateTasks room={room} participantId={participantId} />}
+        {room.current_phase === "REVIEW" && <ReviewPhase room={room} participants={participants} tasks={tasks} reviews={reviews} participantId={participantId} />}
+        {room.current_phase === "RESULTS" && <Results tasks={tasks} reviews={reviews} participants={participants} />}
+        {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} />}
+        {room.current_phase === "FINISHED" && <Finished />}
+      </div>
     </div>
   );
 }

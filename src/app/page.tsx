@@ -52,25 +52,42 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-1 items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">🏥 HU Clinic</CardTitle>
-          <CardDescription>
+    <div className="flex flex-1 items-center justify-center p-6 bg-gradient-to-br from-background via-background to-accent/30">
+      <Card className="w-full max-w-md shadow-xl border-0 shadow-primary/5">
+        <CardHeader className="text-center space-y-3 pb-8 pt-10">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl mb-2">
+            🏥
+          </div>
+          <CardTitle className="text-3xl font-bold tracking-tight">HU Clinic</CardTitle>
+          <CardDescription className="text-base leading-relaxed max-w-xs mx-auto">
             Ingresa el código de sala y tu nombre para unirte a la dinámica
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <Label htmlFor="code">Código de sala</Label>
-              <Input id="code" required placeholder="ABC123" value={code} onChange={(e) => setCode(e.target.value)} />
+        <CardContent className="px-8 pb-10">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <div className="space-y-2">
+              <Label htmlFor="code" className="text-sm font-medium">Código de sala</Label>
+              <Input
+                id="code"
+                required
+                placeholder="ABC123"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="h-12 text-center text-lg tracking-widest uppercase font-semibold"
+              />
             </div>
-            <div>
-              <Label htmlFor="name">Tu nombre</Label>
-              <Input id="name" required value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium">Tu nombre</Label>
+              <Input
+                id="name"
+                required
+                placeholder="Ej: María García"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="h-12"
+              />
             </div>
-            <Button type="submit" disabled={loading} size="lg">
+            <Button type="submit" disabled={loading} size="lg" className="h-12 text-base font-semibold mt-2">
               {loading ? "Entrando..." : "Unirse a sala"}
             </Button>
           </form>

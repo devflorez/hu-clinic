@@ -25,19 +25,21 @@ export function FacilitatorControls({ room }: { room: Room }) {
   };
 
   return (
-    <Card className="border-blue-200 bg-blue-50">
-      <CardContent className="flex flex-wrap items-center gap-2 py-3">
-        <span className="text-sm font-medium text-blue-700 mr-2">Facilitador:</span>
-        <Button size="sm" variant="outline" onClick={nextPhase} disabled={currentIndex >= PHASES.length - 1}>
+    <Card className="border-primary/20 bg-primary/5 shadow-sm">
+      <CardContent className="flex flex-wrap items-center gap-3 py-4 px-5">
+        <span className="text-sm font-semibold text-primary mr-1">⚡ Facilitador</span>
+        <div className="h-5 w-px bg-primary/20" />
+        <Button size="sm" onClick={nextPhase} disabled={currentIndex >= PHASES.length - 1}>
           Siguiente fase →
         </Button>
+        <div className="h-5 w-px bg-primary/20" />
         {TIMER_OPTIONS.map((m) => (
-          <Button key={m} size="sm" variant="ghost" onClick={() => setTimer(m)}>
+          <Button key={m} size="sm" variant="ghost" onClick={() => setTimer(m)} className="text-xs">
             {m} min
           </Button>
         ))}
-        <Button size="sm" variant="ghost" onClick={() => supabase.from("rooms").update({ timer_end_at: null }).eq("id", room.id)}>
-          ⏹ Parar timer
+        <Button size="sm" variant="ghost" onClick={() => supabase.from("rooms").update({ timer_end_at: null }).eq("id", room.id)} className="text-xs">
+          ⏹ Parar
         </Button>
       </CardContent>
     </Card>
