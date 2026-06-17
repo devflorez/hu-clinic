@@ -136,6 +136,39 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
   await facilitatorPage.locator("button", { hasText: "📊" }).click();
   await facilitatorPage.waitForTimeout(2000);
   await expect(facilitatorPage.locator("text=Total tareas")).toBeVisible({ timeout: 5000 });
+
+  // Log results data
+  const statsCards = facilitatorPage.locator("text=Total tareas").locator("..").locator("..");
+  const totalTareas = await facilitatorPage.locator("text=Total tareas").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+  const totalReviews = await facilitatorPage.locator("text=Total reviews").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+  const promClaridad = await facilitatorPage.locator("text=Prom. claridad").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+  const promDetalle = await facilitatorPage.locator("text=Prom. detalle").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+
+  console.log(`   📊 RESULTADOS:`);
+  console.log(`      Total tareas: ${totalTareas}`);
+  console.log(`      Total reviews: ${totalReviews}`);
+  console.log(`      Promedio claridad: ${promClaridad}`);
+  console.log(`      Promedio detalle: ${promDetalle}`);
+
+  // Log best/worst if visible
+  const bestSection = facilitatorPage.locator("text=Mejor calificadas").locator("..").locator("..");
+  if (await bestSection.isVisible({ timeout: 1000 }).catch(() => false)) {
+    const bestItems = await bestSection.locator(".border-b").allTextContents();
+    if (bestItems.length > 0) {
+      console.log(`      🏆 Mejor calificadas:`);
+      bestItems.slice(0, 3).forEach((item) => console.log(`         - ${item.trim()}`));
+    }
+  }
+
+  const worstSection = facilitatorPage.locator("text=Peor calificadas").locator("..").locator("..");
+  if (await worstSection.isVisible({ timeout: 1000 }).catch(() => false)) {
+    const worstItems = await worstSection.locator(".border-b").allTextContents();
+    if (worstItems.length > 0) {
+      console.log(`      ⚠️ Peor calificadas:`);
+      worstItems.slice(0, 3).forEach((item) => console.log(`         - ${item.trim()}`));
+    }
+  }
+
   console.log(`   ✅ Dashboard visible`);
 
   // === 7. REAL_COMPARISON ===
