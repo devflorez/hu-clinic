@@ -48,6 +48,7 @@ export interface Task {
   type: TaskType;
   dependencies: string;
   done_criteria: string;
+  is_from_real: boolean;
   created_at: string;
 }
 

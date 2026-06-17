@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export function WaitingRoom({ room, participants }: { room: Room; participants: Participant[] }) {
+  const visible = participants.filter((p) => p.name !== "__real__");
   return (
     <Card className="shadow-sm">
       <CardHeader className="pb-4">
@@ -17,16 +18,16 @@ export function WaitingRoom({ room, participants }: { room: Room; participants: 
         </div>
         <div>
           <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
-            Participantes ({participants.length})
+            Participantes ({visible.length})
           </h3>
           <div className="flex flex-wrap gap-2">
-            {participants.map((p) => (
+            {visible.map((p) => (
               <Badge key={p.id} variant={p.is_facilitator ? "default" : "secondary"} className="py-1.5 px-3 text-sm">
                 {p.name} {p.is_facilitator && "⭐"}
               </Badge>
             ))}
           </div>
-          {participants.length <= 1 && (
+          {visible.length <= 1 && (
             <p className="text-sm text-muted-foreground mt-4">Esperando participantes...</p>
           )}
         </div>

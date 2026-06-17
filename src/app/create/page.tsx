@@ -88,6 +88,13 @@ export default function CreateRoom() {
 
     // Create real items and their tasks if predefined HU selected
     if (selectedHU) {
+      // Create a ghost participant to hold real tasks (hidden from UI)
+      const { data: ghost } = await supabase
+        .from("participants")
+        .insert({ room_id: room.id, name: "__real__", is_facilitator: false })
+        .select()
+        .single();
+
       for (const item of selectedHU.real_items) {
         const { data: realItem } = await supabase
           .from("real_items")
@@ -113,6 +120,20 @@ export default function CreateRoom() {
               description: t.description,
             }))
           );
+
+          // Also insert as regular tasks (hidden source) for review
+          if (ghost) {
+            await supabase.from("tasks").insert(
+              item.tasks.map((t) => ({
+                room_id: room.id,
+                participant_id: ghost.id,
+                title: t.title,
+                description: t.description,
+                type: "otro",
+                is_from_real: true,
+              }))
+            );
+          }
         }
       }
     }

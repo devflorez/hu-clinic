@@ -104,7 +104,7 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
         {room.current_phase === "CREATE_TASKS" && <CreateTasks room={room} participantId={participantId} />}
         {room.current_phase === "REVIEW" && <ReviewPhase room={room} participants={participants} tasks={tasks} reviews={reviews} participantId={participantId} />}
         {room.current_phase === "RESULTS" && <Results tasks={tasks} reviews={reviews} participants={participants} />}
-        {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} />}
+        {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} reviews={reviews} />}
         {room.current_phase === "FINISHED" && <Finished />}
       </div>
     </div>

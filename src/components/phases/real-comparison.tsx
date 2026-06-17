@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
-import { Room, Task, Participant, RealItem, RealItemMatch, RealTask } from "@/types";
+import { Room, Task, Participant, RealItem, RealItemMatch, RealTask, Review } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function RealComparison({ room, tasks, participants, isFacilitator }: {
-  room: Room; tasks: Task[]; participants: Participant[]; isFacilitator: boolean;
+export function RealComparison({ room, tasks, participants, isFacilitator, reviews }: {
+  room: Room; tasks: Task[]; participants: Participant[]; isFacilitator: boolean; reviews: Review[];
 }) {
   const [realItems, setRealItems] = useState<RealItem[]>([]);
   const [realTasks, setRealTasks] = useState<RealTask[]>([]);
@@ -194,6 +194,63 @@ export function RealComparison({ room, tasks, participants, isFacilitator }: {
           </CardContent>
         </Card>
       )}
+
+      {/* Reveal: real tasks that were rated */}
+      {(() => {
+        const realTareas = tasks.filter((t) => t.is_from_real);
+        if (realTareas.length === 0) return null;
+        return (
+          <Card className="shadow-sm border-amber-200 bg-amber-50/30">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">🎭 Revelación: Tareas que eran reales</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              <p className="text-sm text-muted-foreground">
+                Estas tareas fueron insertadas desde los ítems reales del proyecto. Los participantes las calificaron sin saber su origen.
+              </p>
+              <div className="flex flex-col gap-3">
+                {realTareas.map((task) => {
+                  const taskReviews = reviews.filter((r) => r.task_id === task.id);
+                  const avgClarity = taskReviews.length ? (taskReviews.reduce((s, r) => s + r.clarity, 0) / taskReviews.length).toFixed(1) : "—";
+                  const avgDetail = taskReviews.length ? (taskReviews.reduce((s, r) => s + r.detail, 0) / taskReviews.length).toFixed(1) : "—";
+                  const necessaryCount = taskReviews.filter((r) => r.is_necessary).length;
+                  return (
+                    <div key={task.id} className="border rounded-lg p-3 bg-card">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-sm">{task.title}</span>
+                        <Badge variant="outline" className="text-[10px]">Tarea real</Badge>
+                      </div>
+                      {taskReviews.length > 0 && (
+                        <div className="flex gap-3 mt-2 text-xs text-muted-foreground">
+                          <span>Claridad: <strong className="text-foreground">{avgClarity}</strong>/5</span>
+                          <span>Detalle: <strong className="text-foreground">{avgDetail}</strong>/5</span>
+                          <span>Necesaria: <strong className="text-foreground">{necessaryCount}/{taskReviews.length}</strong></span>
+                          <span>{taskReviews.length} review{taskReviews.length > 1 ? "s" : ""}</span>
+                        </div>
+                      )}
+                      {taskReviews.length === 0 && (
+                        <p className="text-xs text-muted-foreground mt-1">Sin reviews</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Reflection questions */}
+              <div className="border-t pt-4 mt-2">
+                <h4 className="font-semibold text-sm mb-3">🤔 Preguntas de reflexión</h4>
+                <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
+                  <li>• ¿Las tareas reales fueron calificadas como necesarias?</li>
+                  <li>• ¿Faltaron tareas reales que nadie propuso?</li>
+                  <li>• ¿Hubo tareas propuestas que no estaban en las reales pero eran valiosas?</li>
+                  <li>• ¿Las tareas reales tenían suficiente claridad y detalle según los revisores?</li>
+                  <li>• ¿Qué tareas reales fueron las mejor/peor calificadas y por qué?</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })()}
     </div>
   );
 }

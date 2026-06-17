@@ -38,6 +38,7 @@ create table tasks (
   type text not null default 'otro',
   dependencies text not null default '',
   done_criteria text not null default '',
+  is_from_real boolean not null default false,
   created_at timestamptz default now()
 );
 
