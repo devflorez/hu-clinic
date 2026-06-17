@@ -36,6 +36,7 @@ export interface Participant {
   room_id: string;
   name: string;
   is_facilitator: boolean;
+  ready_phase: string;
   created_at: string;
 }
 

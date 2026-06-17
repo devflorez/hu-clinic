@@ -25,6 +25,7 @@ create table participants (
   room_id uuid references rooms(id) on delete cascade not null,
   name text not null,
   is_facilitator boolean default false,
+  ready_phase text not null default '',
   created_at timestamptz default now()
 );
 

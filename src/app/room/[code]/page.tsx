@@ -15,6 +15,8 @@ import { RealComparison } from "@/components/phases/real-comparison";
 import { Finished } from "@/components/phases/finished";
 import { FacilitatorControls } from "@/components/facilitator-controls";
 import { Spinner } from "@/components/spinner";
+import { ReadyButton } from "@/components/ready-button";
+import { ReadyIndicator } from "@/components/ready-indicator";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -118,6 +120,23 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
           {room.current_phase === "RESULTS" && <Results tasks={tasks} reviews={reviews} participants={participants} />}
           {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} reviews={reviews} />}
           {room.current_phase === "FINISHED" && <Finished />}
+
+          {/* Ready system - show in READ_HU, CREATE_TASKS, REVIEW */}
+          {["READ_HU", "CREATE_TASKS", "REVIEW"].includes(room.current_phase) && (
+            <div className="mt-6 flex flex-col gap-4">
+              {isFacilitator ? (
+                <ReadyIndicator participants={participants} currentPhase={room.current_phase} />
+              ) : (
+                <div className="flex justify-center">
+                  <ReadyButton
+                    participantId={participantId}
+                    currentPhase={room.current_phase}
+                    readyPhase={participants.find((p) => p.id === participantId)?.ready_phase || ""}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

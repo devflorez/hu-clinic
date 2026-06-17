@@ -22,6 +22,8 @@ export function FacilitatorControls({ room }: { room: Room }) {
 
   const changePhase = async (phase: Phase) => {
     await supabase.from("rooms").update({ current_phase: phase, timer_end_at: null }).eq("id", room.id);
+    // Reset all participants' ready status
+    await supabase.from("participants").update({ ready_phase: "" }).eq("room_id", room.id);
   };
 
   const setTimer = async (minutes: number) => {
