@@ -39,6 +39,10 @@ export default function CreateRoom() {
       title: hu.title,
       description: hu.description,
       acceptance_criteria: hu.acceptance_criteria,
+      story_points: String(hu.story_points),
+      assignee: hu.assignee,
+      activated_at: hu.activated_at,
+      closed_at: hu.closed_at,
     });
   };
 
@@ -173,18 +177,36 @@ export default function CreateRoom() {
 
           {/* Selected HU preview */}
           {mode === "select" && selectedHU && (
-            <div className="border rounded-xl p-4 bg-accent/30 mb-6">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-sm">{selectedHU.title}</span>
-                <Button size="sm" variant="ghost" onClick={() => { setSelectedHU(null); setForm({ ...form, title: "", description: "", acceptance_criteria: "" }); }} className="text-xs">
+            <div className="border rounded-xl p-5 bg-accent/30 mb-6 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <span className="font-semibold">{selectedHU.title}</span>
+                <Button size="sm" variant="ghost" onClick={() => { setSelectedHU(null); setForm({ ...form, title: "", description: "", acceptance_criteria: "", story_points: "", assignee: "", activated_at: "", closed_at: "" }); }} className="text-xs">
                   Cambiar
                 </Button>
               </div>
+              <p className="text-sm text-muted-foreground">{selectedHU.description}</p>
               <div className="flex flex-wrap gap-2">
                 <Badge variant="secondary">{selectedHU.story_points} pts</Badge>
-                <Badge variant="outline">{selectedHU.assignee}</Badge>
-                <Badge variant="outline">{selectedHU.activated_at} → {selectedHU.closed_at}</Badge>
-                <Badge variant="outline">{selectedHU.real_items[0]?.tasks.length || 0} tasks reales</Badge>
+                <Badge variant="outline">👤 {selectedHU.assignee}</Badge>
+                <Badge variant="outline">📅 {selectedHU.activated_at} → {selectedHU.closed_at}</Badge>
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Criterios de aceptación</span>
+                <p className="text-sm mt-1 whitespace-pre-wrap">{selectedHU.acceptance_criteria}</p>
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Tasks reales ({selectedHU.real_items[0]?.tasks.length || 0})
+                </span>
+                <div className="grid gap-1.5 mt-2">
+                  {selectedHU.real_items[0]?.tasks.map((t) => (
+                    <div key={t.external_id} className="flex items-center gap-2 bg-card rounded-lg px-3 py-2 text-sm border">
+                      <span className="text-muted-foreground font-mono text-xs">#{t.external_id}</span>
+                      <span>{t.title}</span>
+                      {t.description && <span className="text-xs text-muted-foreground ml-auto truncate max-w-40">{t.description}</span>}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
