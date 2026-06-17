@@ -26,6 +26,10 @@ export default function CreateRoom() {
     description: "",
     acceptance_criteria: "",
     facilitator_name: "",
+    story_points: "",
+    assignee: "",
+    activated_at: "",
+    closed_at: "",
   });
 
   const selectPredefined = (hu: PredefinedHU) => {
@@ -51,10 +55,10 @@ export default function CreateRoom() {
         title: form.title,
         description: form.description,
         acceptance_criteria: form.acceptance_criteria,
-        story_points: selectedHU?.story_points || null,
-        assignee: selectedHU?.assignee || "",
-        activated_at: selectedHU?.activated_at || null,
-        closed_at: selectedHU?.closed_at || null,
+        story_points: selectedHU?.story_points || (form.story_points ? Number(form.story_points) : null),
+        assignee: selectedHU?.assignee || form.assignee,
+        activated_at: selectedHU?.activated_at || form.activated_at || null,
+        closed_at: selectedHU?.closed_at || form.closed_at || null,
       })
       .select()
       .single();
@@ -205,6 +209,26 @@ export default function CreateRoom() {
                 <div className="space-y-2">
                   <Label htmlFor="acceptance_criteria">Criterios de aceptación</Label>
                   <Textarea id="acceptance_criteria" rows={4} value={form.acceptance_criteria} onChange={(e) => setForm({ ...form, acceptance_criteria: e.target.value })} className="resize-none" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="story_points">Puntos de historia</Label>
+                    <Input id="story_points" type="number" value={form.story_points} onChange={(e) => setForm({ ...form, story_points: e.target.value })} className="h-11" placeholder="Ej: 3" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="assignee">Responsable</Label>
+                    <Input id="assignee" value={form.assignee} onChange={(e) => setForm({ ...form, assignee: e.target.value })} className="h-11" placeholder="Nombre" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="activated_at">Fecha inicio</Label>
+                    <Input id="activated_at" type="date" value={form.activated_at} onChange={(e) => setForm({ ...form, activated_at: e.target.value })} className="h-11" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="closed_at">Fecha cierre</Label>
+                    <Input id="closed_at" type="date" value={form.closed_at} onChange={(e) => setForm({ ...form, closed_at: e.target.value })} className="h-11" />
+                  </div>
                 </div>
               </>
             )}
