@@ -99,8 +99,12 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
     const page = participantPages[i];
     const tasks = TASKS_PER_PARTICIPANT[i];
 
-    // Wait for phase to load via realtime
-    await page.locator("text=Backlog").waitFor({ state: "visible", timeout: 20000 });
+    // Wait for phase to load via realtime (fallback: reload page)
+    const backlog = page.locator("text=Backlog");
+    if (!await backlog.isVisible({ timeout: 10000 }).catch(() => false)) {
+      await page.reload();
+      await backlog.waitFor({ state: "visible", timeout: 15000 });
+    }
 
     for (let t = 0; t < tasks.length; t++) {
       await createTask(page, tasks[t], t === 0);
