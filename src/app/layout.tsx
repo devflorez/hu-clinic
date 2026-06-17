@@ -15,8 +15,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "HU Clinic",
+  title: "TaskSplit",
   description: "Dinámica colaborativa para revisar descomposición de Historias de Usuario",
+  icons: { icon: "/favicon.svg" },
 };
 
 export default function RootLayout({

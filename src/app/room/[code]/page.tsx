@@ -13,6 +13,7 @@ import { Results } from "@/components/phases/results";
 import { RealComparison } from "@/components/phases/real-comparison";
 import { Finished } from "@/components/phases/finished";
 import { FacilitatorControls } from "@/components/facilitator-controls";
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -66,7 +67,9 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-primary/10 rounded-lg flex items-center justify-center text-lg">🏥</div>
+          <div className="w-9 h-9">
+            <Image src="/logo.svg" alt="TaskSplit" width={36} height={36} />
+          </div>
           <div>
             <h1 className="text-lg font-bold leading-tight">{room.title}</h1>
             <div className="flex items-center gap-2 mt-1">

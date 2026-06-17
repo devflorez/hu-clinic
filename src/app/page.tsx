@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,10 +56,10 @@ export default function Home() {
     <div className="flex flex-1 items-center justify-center p-6 bg-gradient-to-br from-background via-background to-accent/30">
       <Card className="w-full max-w-md shadow-xl border-0 shadow-primary/5">
         <CardHeader className="text-center space-y-3 pb-8 pt-10">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-3xl mb-2">
-            🏥
+          <div className="mx-auto w-16 h-16 mb-2">
+            <Image src="/logo.svg" alt="TaskSplit" width={64} height={64} />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight">HU Clinic</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight">TaskSplit</CardTitle>
           <CardDescription className="text-base leading-relaxed max-w-xs mx-auto">
             Ingresa el código de sala y tu nombre para unirte a la dinámica
           </CardDescription>
