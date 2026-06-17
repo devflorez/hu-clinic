@@ -6,18 +6,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 export function Results({ tasks, reviews, participants }: { tasks: Task[]; reviews: Review[]; participants: Participant[] }) {
+  const visibleTasks = tasks.filter((t) => !t.is_from_real);
+  const visibleParticipants = participants.filter((p) => p.name !== "__real__");
+
   const stats = useMemo(() => {
-    const tasksByParticipant = participants
+    const tasksByParticipant = visibleParticipants
       .filter((p) => !p.is_facilitator)
-      .map((p) => ({ name: p.name, count: tasks.filter((t) => t.participant_id === p.id).length }))
+      .map((p) => ({ name: p.name, count: visibleTasks.filter((t) => t.participant_id === p.id).length }))
       .sort((a, b) => b.count - a.count);
 
-    const taskStats = tasks.map((task) => {
+    const taskStats = visibleTasks.map((task) => {
       const taskReviews = reviews.filter((r) => r.task_id === task.id);
       const avgClarity = taskReviews.length ? taskReviews.reduce((s, r) => s + r.clarity, 0) / taskReviews.length : 0;
       const avgDetail = taskReviews.length ? taskReviews.reduce((s, r) => s + r.detail, 0) / taskReviews.length : 0;
       const commentCount = taskReviews.filter((r) => r.comment).length;
-      const owner = participants.find((p) => p.id === task.participant_id);
+      const owner = visibleParticipants.find((p) => p.id === task.participant_id);
       return { ...task, avgClarity, avgDetail, commentCount, reviewCount: taskReviews.length, ownerName: owner?.name || "?" };
     });
 
@@ -30,7 +33,7 @@ export function Results({ tasks, reviews, participants }: { tasks: Task[]; revie
     const avgDetail = reviewed.length ? reviewed.reduce((s, t) => s + t.avgDetail, 0) / reviewed.length : 0;
 
     return { tasksByParticipant, taskStats, best, worst, mostCommented, avgClarity, avgDetail };
-  }, [tasks, reviews, participants]);
+  }, [visibleTasks, reviews, visibleParticipants]);
 
   const typeColors: Record<string, string> = {
     frontend: "bg-blue-50 text-blue-700 border-blue-200",
@@ -158,12 +161,12 @@ export function Results({ tasks, reviews, participants }: { tasks: Task[]; revie
             {["frontend", "backend", "QA", "análisis", "devops", "diseño", "otro"].map((type) => (
               <div key={type} className="flex flex-col gap-2">
                 <div className={`text-xs font-semibold px-3 py-1.5 rounded-md border ${typeColors[type]}`}>
-                  {type} ({tasks.filter(t => t.type === type).length})
+                  {type} ({visibleTasks.filter(t => t.type === type).length})
                 </div>
-                {tasks.filter((t) => t.type === type).map((task) => (
+                {visibleTasks.filter((t) => t.type === type).map((task) => (
                   <div key={task.id} className="border rounded-lg p-2.5 text-xs bg-card shadow-sm">
                     <div className="font-medium leading-tight">{task.title}</div>
-                    <div className="text-muted-foreground mt-1">{participants.find(p => p.id === task.participant_id)?.name}</div>
+                    <div className="text-muted-foreground mt-1">{visibleParticipants.find(p => p.id === task.participant_id)?.name}</div>
                   </div>
                 ))}
               </div>
