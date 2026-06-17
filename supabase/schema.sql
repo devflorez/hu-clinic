@@ -10,6 +10,10 @@ create table rooms (
   title text not null,
   description text not null default '',
   acceptance_criteria text not null default '',
+  story_points integer,
+  assignee text not null default '',
+  activated_at date,
+  closed_at date,
   current_phase text not null default 'WAITING_ROOM',
   timer_end_at timestamptz,
   created_at timestamptz default now()
@@ -24,7 +28,7 @@ create table participants (
   created_at timestamptz default now()
 );
 
--- Tasks table
+-- Tasks table (created by participants during the dynamic)
 create table tasks (
   id uuid primary key default gen_random_uuid(),
   room_id uuid references rooms(id) on delete cascade not null,
@@ -54,6 +58,20 @@ create table reviews (
 create table real_items (
   id uuid primary key default gen_random_uuid(),
   room_id uuid references rooms(id) on delete cascade not null,
+  external_id text not null default '',
+  title text not null,
+  description text not null default '',
+  points integer,
+  assignee text not null default '',
+  activated_at date,
+  closed_at date
+);
+
+-- Real tasks (actual tasks that belong to a real item)
+create table real_tasks (
+  id uuid primary key default gen_random_uuid(),
+  real_item_id uuid references real_items(id) on delete cascade not null,
+  external_id text not null default '',
   title text not null,
   description text not null default ''
 );
@@ -73,6 +91,7 @@ create index idx_tasks_participant on tasks(participant_id);
 create index idx_reviews_task on reviews(task_id);
 create index idx_reviews_reviewer on reviews(reviewer_id);
 create index idx_real_items_room on real_items(room_id);
+create index idx_real_tasks_item on real_tasks(real_item_id);
 create index idx_real_item_matches_real_item on real_item_matches(real_item_id);
 create index idx_real_item_matches_task on real_item_matches(task_id);
 create index idx_rooms_code on rooms(code);
@@ -89,6 +108,7 @@ alter table participants enable row level security;
 alter table tasks enable row level security;
 alter table reviews enable row level security;
 alter table real_items enable row level security;
+alter table real_tasks enable row level security;
 alter table real_item_matches enable row level security;
 
 create policy "Allow all on rooms" on rooms for all using (true) with check (true);
@@ -96,4 +116,5 @@ create policy "Allow all on participants" on participants for all using (true) w
 create policy "Allow all on tasks" on tasks for all using (true) with check (true);
 create policy "Allow all on reviews" on reviews for all using (true) with check (true);
 create policy "Allow all on real_items" on real_items for all using (true) with check (true);
+create policy "Allow all on real_tasks" on real_tasks for all using (true) with check (true);
 create policy "Allow all on real_item_matches" on real_item_matches for all using (true) with check (true);

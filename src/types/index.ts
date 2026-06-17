@@ -22,6 +22,10 @@ export interface Room {
   title: string;
   description: string;
   acceptance_criteria: string;
+  story_points: number | null;
+  assignee: string;
+  activated_at: string | null;
+  closed_at: string | null;
   current_phase: Phase;
   timer_end_at: string | null;
   created_at: string;
@@ -62,6 +66,19 @@ export interface Review {
 export interface RealItem {
   id: string;
   room_id: string;
+  external_id: string;
+  title: string;
+  description: string;
+  points: number | null;
+  assignee: string;
+  activated_at: string | null;
+  closed_at: string | null;
+}
+
+export interface RealTask {
+  id: string;
+  real_item_id: string;
+  external_id: string;
   title: string;
   description: string;
 }
@@ -71,4 +88,22 @@ export interface RealItemMatch {
   real_item_id: string;
   task_id: string;
   coverage: "full" | "partial" | "none";
+}
+
+// Predefined HU for facilitator selection
+export interface PredefinedHU {
+  id: string;
+  title: string;
+  description: string;
+  acceptance_criteria: string;
+  story_points: number;
+  assignee: string;
+  activated_at: string;
+  closed_at: string;
+  real_items: {
+    external_id: string;
+    title: string;
+    description: string;
+    tasks: { external_id: string; title: string; description: string }[];
+  }[];
 }
