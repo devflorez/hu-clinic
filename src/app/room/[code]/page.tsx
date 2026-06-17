@@ -2,6 +2,7 @@
 
 import { use } from "react";
 import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "motion/react";
 import { useRoom } from "@/hooks/use-room";
 import { useTimer } from "@/hooks/use-timer";
 import { supabase } from "@/lib/supabase";
@@ -13,6 +14,7 @@ import { Results } from "@/components/phases/results";
 import { RealComparison } from "@/components/phases/real-comparison";
 import { Finished } from "@/components/phases/finished";
 import { FacilitatorControls } from "@/components/facilitator-controls";
+import { Spinner } from "@/components/spinner";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,14 +25,13 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   const { room, participants, tasks, reviews, loading } = useRoom(code);
   const { display, remaining } = useTimer(room?.timer_end_at ?? null);
 
-  if (loading) return <div className="flex flex-1 items-center justify-center text-muted-foreground">Cargando...</div>;
+  if (loading) return <div className="flex flex-1 items-center justify-center"><Spinner text="Conectando a la sala..." /></div>;
   if (!room) {
-    // Room was deleted — redirect participants to home
     if (typeof window !== "undefined") {
       sessionStorage.clear();
       window.location.href = "/";
     }
-    return <div className="flex flex-1 items-center justify-center text-muted-foreground">La sala fue eliminada. Redirigiendo...</div>;
+    return <div className="flex flex-1 items-center justify-center"><Spinner text="La sala fue eliminada. Redirigiendo..." /></div>;
   }
 
   const participantId = typeof window !== "undefined" ? sessionStorage.getItem("participant_id") : null;
@@ -101,15 +102,24 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
       {isFacilitator && <FacilitatorControls room={room} />}
 
       {/* Phase Content */}
-      <div className="flex-1">
-        {room.current_phase === "WAITING_ROOM" && <WaitingRoom room={room} participants={participants} />}
-        {room.current_phase === "READ_HU" && <ReadHU room={room} />}
-        {room.current_phase === "CREATE_TASKS" && <CreateTasks room={room} participantId={participantId} />}
-        {room.current_phase === "REVIEW" && <ReviewPhase room={room} participants={participants} tasks={tasks} reviews={reviews} participantId={participantId} />}
-        {room.current_phase === "RESULTS" && <Results tasks={tasks} reviews={reviews} participants={participants} />}
-        {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} reviews={reviews} />}
-        {room.current_phase === "FINISHED" && <Finished />}
-      </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={room.current_phase}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.25 }}
+          className="flex-1"
+        >
+          {room.current_phase === "WAITING_ROOM" && <WaitingRoom room={room} participants={participants} />}
+          {room.current_phase === "READ_HU" && <ReadHU room={room} />}
+          {room.current_phase === "CREATE_TASKS" && <CreateTasks room={room} participantId={participantId} />}
+          {room.current_phase === "REVIEW" && <ReviewPhase room={room} participants={participants} tasks={tasks} reviews={reviews} participantId={participantId} />}
+          {room.current_phase === "RESULTS" && <Results tasks={tasks} reviews={reviews} participants={participants} />}
+          {room.current_phase === "REAL_COMPARISON" && <RealComparison room={room} tasks={tasks} participants={participants} isFacilitator={isFacilitator} reviews={reviews} />}
+          {room.current_phase === "FINISHED" && <Finished />}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
