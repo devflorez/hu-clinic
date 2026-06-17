@@ -73,7 +73,30 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-0 border rounded-xl overflow-hidden bg-card shadow-sm min-h-[500px]">
+    <div className="flex flex-col gap-4">
+      {/* HU Context - collapsible */}
+      <details className="border rounded-xl bg-accent/30 shadow-sm">
+        <summary className="px-5 py-3 cursor-pointer font-semibold text-sm flex items-center gap-2">
+          📖 Ver Historia de Usuario
+          <Badge variant="secondary" className="text-xs ml-auto">{room.story_points ? `${room.story_points} pts` : ""}</Badge>
+        </summary>
+        <div className="px-5 pb-4 flex flex-col gap-3 border-t pt-3">
+          <p className="text-sm leading-relaxed">{room.description}</p>
+          {room.acceptance_criteria && (
+            <div>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Criterios de aceptación</span>
+              <p className="text-sm whitespace-pre-wrap mt-1 bg-card rounded-lg p-3">{room.acceptance_criteria}</p>
+            </div>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {room.assignee && <Badge variant="outline" className="text-xs">👤 {room.assignee}</Badge>}
+            {room.activated_at && <Badge variant="outline" className="text-xs">📅 {room.activated_at}</Badge>}
+            {room.closed_at && <Badge variant="outline" className="text-xs">✅ {room.closed_at}</Badge>}
+          </div>
+        </div>
+      </details>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-0 border rounded-xl overflow-hidden bg-card shadow-sm min-h-[500px]">
       {/* Left panel - Backlog list (Azure DevOps style) */}
       <div className="border-r flex flex-col">
         {/* Panel header */}
@@ -205,6 +228,7 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
             </p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
