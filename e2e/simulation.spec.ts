@@ -117,7 +117,7 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
       await titleInput.fill(task.title);
 
       // Submit form
-      const saveBtn = page.locator("button", { hasText: "Guardar work item" });
+      const saveBtn = page.locator("button", { hasText: "Guardar tarea" });
       await saveBtn.waitFor({ state: "visible", timeout: 5000 });
       await saveBtn.click();
 

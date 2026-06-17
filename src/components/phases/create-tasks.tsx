@@ -142,7 +142,7 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
           <div className="flex-1 p-6">
             <div className="flex items-center gap-2 mb-5">
               <div className="w-2 h-5 bg-primary rounded-full" />
-              <h3 className="font-semibold text-lg">Nuevo Work Item</h3>
+              <h3 className="font-semibold text-lg">Nuevo ítem de trabajo</h3>
             </div>
             <form onSubmit={addTask} className="flex flex-col gap-4 max-w-xl">
               <div className="space-y-1.5">
@@ -173,7 +173,7 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
                 <Textarea rows={2} value={form.done_criteria} onChange={(e) => setForm({ ...form, done_criteria: e.target.value })} className="resize-none" placeholder="¿Cómo sabemos que está hecha?" />
               </div>
               <div className="flex gap-3 mt-2">
-                <Button type="submit" className="h-10 font-semibold">Guardar work item</Button>
+                <Button type="submit" className="h-10 font-semibold">Guardar tarea</Button>
                 <Button type="button" variant="ghost" onClick={() => setIsCreating(false)} className="h-10">Cancelar</Button>
               </div>
             </form>
@@ -221,7 +221,7 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
           // Empty state
           <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
             <div className="text-5xl mb-4">📝</div>
-            <h3 className="font-semibold text-lg mb-1">Selecciona o crea un work item</h3>
+            <h3 className="font-semibold text-lg mb-1">Selecciona o crea una tarea</h3>
             <p className="text-sm text-muted-foreground max-w-xs">
               Usa el panel izquierdo para ver tus tareas o crea una nueva con el botón &quot;+ Nuevo&quot;.
             </p>
