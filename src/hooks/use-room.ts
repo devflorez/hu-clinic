@@ -46,9 +46,10 @@ export function useRoom(code: string) {
       ]);
       setLoading(false);
 
-      // Subscribe to realtime changes
-      channel = supabase
-        .channel(`room-${roomData.id}`)
+      // Create channel, attach all listeners, THEN subscribe
+      channel = supabase.channel(`room-${roomData.id}`);
+
+      channel
         .on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomData.id}` },
           (payload) => {
             if (payload.eventType === "DELETE") { setRoom(null); }
@@ -63,8 +64,9 @@ export function useRoom(code: string) {
         )
         .on("postgres_changes", { event: "*", schema: "public", table: "reviews" },
           () => { fetchReviews(roomData.id); }
-        )
-        .subscribe();
+        );
+
+      channel.subscribe();
     };
 
     init();
