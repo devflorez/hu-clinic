@@ -23,7 +23,10 @@ export function useRoom(code: string) {
   }, []);
 
   const fetchReviews = useCallback(async (roomId: string) => {
-    const { data } = await supabase.from("reviews").select();
+    const { data: roomTasks } = await supabase.from("tasks").select("id").eq("room_id", roomId);
+    if (!roomTasks || roomTasks.length === 0) { setReviews([]); return; }
+    const taskIds = roomTasks.map((t) => t.id);
+    const { data } = await supabase.from("reviews").select().in("task_id", taskIds);
     if (data) setReviews(data);
   }, []);
 

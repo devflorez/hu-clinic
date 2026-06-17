@@ -31,6 +31,10 @@ export function FacilitatorControls({ room }: { room: Room }) {
     await supabase.from("rooms").update({ timer_end_at: end }).eq("id", room.id);
   };
 
+  const stopTimer = async () => {
+    await supabase.from("rooms").update({ timer_end_at: null }).eq("id", room.id);
+  };
+
   return (
     <Card className="border-primary/20 bg-primary/5 shadow-sm">
       <CardContent className="py-5 px-6 flex flex-col gap-5">
@@ -66,7 +70,7 @@ export function FacilitatorControls({ room }: { room: Room }) {
                 {m} min
               </Button>
             ))}
-            <Button size="sm" variant="ghost" onClick={() => supabase.from("rooms").update({ timer_end_at: null }).eq("id", room.id)} className="text-xs h-8 px-3 text-destructive font-medium">
+            <Button size="sm" variant="ghost" onClick={stopTimer} className="text-xs h-8 px-3 text-destructive font-medium">
               ⏹ Detener
             </Button>
           </div>
