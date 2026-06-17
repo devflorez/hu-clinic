@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const QUESTIONS = [
   "¿Qué faltó en la HU para que todos llegáramos a tareas similares?",
   "¿Qué criterios de aceptación estaban ambiguos?",
-  "¿Qué tareas aparecieron tarde?",
   "¿Qué tarea fue la más clara y por qué?",
   "¿Qué tarea fue la más débil y por qué?",
   "¿Qué deberíamos mejorar al crear ítems en próximas HU?",
