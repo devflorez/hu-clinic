@@ -80,14 +80,13 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
     <div className="flex flex-col gap-5">
       {/* Board selector */}
       <div className="flex gap-3 flex-wrap">
-        {assignments.map((pid) => {
-          const p = participants.find((x) => x.id === pid);
+        {assignments.map((pid, idx) => {
           const boardDone = tasks.filter((t) => t.participant_id === pid).every((t) => submittedReviews.has(t.id));
           return (
             <Button key={pid} variant={selectedBoard === pid ? "default" : "outline"} size="sm"
               onClick={() => { setSelectedBoard(pid); setCurrentTaskIndex(0); }}
               className="gap-2">
-              {p?.name === "__real__" ? "Participante Anónimo" : p?.name || "?"} {boardDone && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">✓</Badge>}
+              Tablero {idx + 1} {boardDone && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">✓</Badge>}
             </Button>
           );
         })}
@@ -99,7 +98,7 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
           <Card className="shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Tablero de {boardOwner?.name === "__real__" ? "Participante Anónimo" : boardOwner?.name}</CardTitle>
+                <CardTitle className="text-base">Tablero {assignments.indexOf(selectedBoard) + 1}</CardTitle>
                 <Badge variant="secondary" className="text-xs">Tarea {currentTaskIndex + 1}/{boardTasks.length}</Badge>
               </div>
             </CardHeader>
