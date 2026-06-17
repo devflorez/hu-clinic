@@ -139,30 +139,38 @@ export function ReviewPhase({ room, participants, tasks, reviews, participantId 
               ) : (
                 <div className="flex flex-col gap-4">
                   <div className="space-y-2">
-                    <Label>¿Se entiende la tarea? (Claridad 1-5)</Label>
+                    <Label>¿Se entiende la tarea? (Claridad)</Label>
                     <Select value={String(reviewForm.clarity)} onValueChange={(v) => setReviewForm({ ...reviewForm, clarity: Number(v) })}>
                       <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {[1, 2, 3, 4, 5].map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                        <SelectItem value="1">1 — Nada clara</SelectItem>
+                        <SelectItem value="2">2 — Poco clara</SelectItem>
+                        <SelectItem value="3">3 — Aceptable</SelectItem>
+                        <SelectItem value="4">4 — Clara</SelectItem>
+                        <SelectItem value="5">5 — Muy clara</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
                     <Label>¿Es necesaria?</Label>
-                    <Select value={reviewForm.is_necessary ? "yes" : "no"} onValueChange={(v) => setReviewForm({ ...reviewForm, is_necessary: v === "yes" })}>
+                    <Select value={reviewForm.is_necessary ? "si" : "no"} onValueChange={(v) => setReviewForm({ ...reviewForm, is_necessary: v === "si" })}>
                       <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="yes">Sí</SelectItem>
+                        <SelectItem value="si">Sí</SelectItem>
                         <SelectItem value="no">No</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>¿Está bien detallada? (Detalle 1-5)</Label>
+                    <Label>¿Está bien detallada? (Detalle)</Label>
                     <Select value={String(reviewForm.detail)} onValueChange={(v) => setReviewForm({ ...reviewForm, detail: Number(v) })}>
                       <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
                       <SelectContent>
-                        {[1, 2, 3, 4, 5].map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                        <SelectItem value="1">1 — Sin detalle</SelectItem>
+                        <SelectItem value="2">2 — Poco detalle</SelectItem>
+                        <SelectItem value="3">3 — Aceptable</SelectItem>
+                        <SelectItem value="4">4 — Buen detalle</SelectItem>
+                        <SelectItem value="5">5 — Muy detallada</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
