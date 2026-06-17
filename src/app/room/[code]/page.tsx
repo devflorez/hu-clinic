@@ -66,32 +66,32 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   return (
     <div className="flex flex-col flex-1 p-6 md:p-8 gap-6 max-w-6xl mx-auto w-full">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9">
-            <Image src="/logo.svg" alt="TaskSplit" width={36} height={36} />
+      <div className="flex items-center justify-between flex-wrap gap-4 pb-5 border-b">
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 shrink-0">
+            <Image src="/logo.svg" alt="TaskSplit" width={40} height={40} />
           </div>
           <div>
             <h1 className="text-lg font-bold leading-tight">{room.title}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="secondary" className="text-xs font-mono">{room.code}</Badge>
-              <Badge className="text-xs">{phaseLabels[room.current_phase] || room.current_phase}</Badge>
+            <div className="flex items-center gap-2.5 mt-1.5">
+              <Badge variant="secondary" className="text-xs font-mono px-2.5 py-0.5">{room.code}</Badge>
+              <Badge className="text-xs px-2.5 py-0.5">{phaseLabels[room.current_phase] || room.current_phase}</Badge>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           {room.timer_end_at && remaining > 0 && (
-            <div className="flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-lg">
-              <span className="text-sm font-medium">⏱</span>
+            <div className="flex items-center gap-2 bg-destructive/10 text-destructive px-5 py-2.5 rounded-xl">
+              <span className="text-sm">⏱</span>
               <span className="text-xl font-bold font-mono">{display}</span>
             </div>
           )}
           {isFacilitator ? (
-            <Button size="sm" variant="destructive" onClick={handleDeleteRoom} className="text-xs">
-              🗑️ Eliminar sala
+            <Button size="sm" variant="destructive" onClick={handleDeleteRoom} className="text-xs h-9 px-4">
+              🗑️ Eliminar
             </Button>
           ) : (
-            <Button size="sm" variant="ghost" onClick={handleLeaveRoom} className="text-xs text-muted-foreground">
+            <Button size="sm" variant="ghost" onClick={handleLeaveRoom} className="text-xs text-muted-foreground h-9 px-4">
               Salir
             </Button>
           )}

@@ -7,11 +7,11 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const PHASES: { key: Phase; label: string; icon: string }[] = [
   { key: "WAITING_ROOM", label: "Espera", icon: "⏳" },
-  { key: "READ_HU", label: "Lectura HU", icon: "📖" },
-  { key: "CREATE_TASKS", label: "Crear tareas", icon: "✏️" },
+  { key: "READ_HU", label: "Lectura", icon: "📖" },
+  { key: "CREATE_TASKS", label: "Tareas", icon: "✏️" },
   { key: "REVIEW", label: "Revisión", icon: "👀" },
   { key: "RESULTS", label: "Resultados", icon: "📊" },
-  { key: "REAL_COMPARISON", label: "Comparación", icon: "🔗" },
+  { key: "REAL_COMPARISON", label: "Comparar", icon: "🔗" },
   { key: "FINISHED", label: "Fin", icon: "🎉" },
 ];
 
@@ -31,35 +31,43 @@ export function FacilitatorControls({ room }: { room: Room }) {
 
   return (
     <Card className="border-primary/20 bg-primary/5 shadow-sm">
-      <CardContent className="py-4 px-5 flex flex-col gap-4">
+      <CardContent className="py-5 px-6 flex flex-col gap-5">
         {/* Phase selector */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-primary uppercase tracking-wide mr-1">Fase:</span>
-          {PHASES.map((phase, i) => (
-            <Button
-              key={phase.key}
-              size="sm"
-              variant={phase.key === room.current_phase ? "default" : "outline"}
-              onClick={() => changePhase(phase.key)}
-              className={`text-xs gap-1 h-8 ${i < currentIndex ? "opacity-60" : ""}`}
-            >
-              <span>{phase.icon}</span>
-              <span className="hidden sm:inline">{phase.label}</span>
-            </Button>
-          ))}
+        <div>
+          <span className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-2.5 block">Fases</span>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {PHASES.map((phase, i) => {
+              const isActive = phase.key === room.current_phase;
+              const isPast = i < currentIndex;
+              return (
+                <Button
+                  key={phase.key}
+                  size="sm"
+                  variant={isActive ? "default" : "outline"}
+                  onClick={() => changePhase(phase.key)}
+                  className={`text-xs gap-1.5 h-9 px-3 ${isPast ? "opacity-50" : ""} ${isActive ? "shadow-md" : ""}`}
+                >
+                  <span>{phase.icon}</span>
+                  <span className="hidden md:inline">{phase.label}</span>
+                </Button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Timer controls */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-primary uppercase tracking-wide mr-1">Timer:</span>
-          {TIMER_OPTIONS.map((m) => (
-            <Button key={m} size="sm" variant="ghost" onClick={() => setTimer(m)} className="text-xs h-7 px-2.5">
-              {m} min
+        <div>
+          <span className="text-[11px] font-semibold text-primary uppercase tracking-wider mb-2.5 block">Temporizador</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {TIMER_OPTIONS.map((m) => (
+              <Button key={m} size="sm" variant="outline" onClick={() => setTimer(m)} className="text-xs h-8 px-3 font-medium">
+                {m} min
+              </Button>
+            ))}
+            <Button size="sm" variant="ghost" onClick={() => supabase.from("rooms").update({ timer_end_at: null }).eq("id", room.id)} className="text-xs h-8 px-3 text-destructive font-medium">
+              ⏹ Detener
             </Button>
-          ))}
-          <Button size="sm" variant="ghost" onClick={() => supabase.from("rooms").update({ timer_end_at: null }).eq("id", room.id)} className="text-xs h-7 px-2.5 text-destructive">
-            ⏹ Parar
-          </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
