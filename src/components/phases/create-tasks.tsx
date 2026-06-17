@@ -147,7 +147,7 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
             <form onSubmit={addTask} className="flex flex-col gap-4 max-w-xl">
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Título</Label>
-                <Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="h-11 text-base font-medium" placeholder="¿Qué hay que hacer?" autoFocus />
+                <Input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="h-11 text-base font-medium" placeholder="¿Qué hay que hacer?" autoFocus data-testid="task-title-input" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">

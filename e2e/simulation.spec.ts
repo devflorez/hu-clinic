@@ -103,16 +103,16 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
       } else {
         await newBtn.click();
       }
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(800);
 
-      // Fill title - find the visible input in the form area
-      const titleInput = page.locator("input.h-11.text-base").first();
-      await titleInput.waitFor({ state: "visible", timeout: 5000 });
+      // Fill title
+      const titleInput = page.locator('[data-testid="task-title-input"]');
+      await titleInput.waitFor({ state: "visible", timeout: 8000 });
       await titleInput.fill(task.title);
 
       // Save without changing other fields (keep defaults)
       await page.locator("button", { hasText: "Guardar work item" }).click();
-      await page.waitForTimeout(400);
+      await page.waitForTimeout(600);
     }
     console.log(`   ✏️ ${PARTICIPANTS[i]} creó ${tasks.length} tareas`);
   }
