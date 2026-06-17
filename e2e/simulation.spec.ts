@@ -85,25 +85,26 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
   // 4. CREATE_TASKS
   console.log(`⏭️ CREATE_TASKS`);
   await facilitatorPage.locator("button", { hasText: "✏️" }).click();
-  await facilitatorPage.waitForTimeout(2000);
+  await facilitatorPage.waitForTimeout(3000);
 
   // Each participant creates tasks
   for (let i = 0; i < participantPages.length; i++) {
     const page = participantPages[i];
     const tasks = TASKS_PER_PARTICIPANT[i];
-    await page.waitForTimeout(1500);
+
+    // Wait for the CREATE_TASKS phase to be visible (realtime update)
+    await page.locator("text=Backlog").waitFor({ state: "visible", timeout: 15000 });
 
     for (const task of tasks) {
       // Click new button - try both variants
-      const newBtn = page.locator("button", { hasText: "+ Nuevo" });
       const firstTaskBtn = page.locator("button", { hasText: "Crear primera tarea" });
+      const newBtn = page.locator("button", { hasText: "+ Nuevo" });
 
-      if (await firstTaskBtn.isVisible({ timeout: 500 }).catch(() => false)) {
+      if (await firstTaskBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
         await firstTaskBtn.click();
       } else {
         await newBtn.click();
       }
-      await page.waitForTimeout(800);
 
       // Fill title
       const titleInput = page.locator('[data-testid="task-title-input"]');
