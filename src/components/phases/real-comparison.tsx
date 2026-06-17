@@ -88,55 +88,6 @@ export function RealComparison({ room, tasks, participants, isFacilitator, revie
         </Card>
       </div>
 
-      {/* Real items with their actual tasks */}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">📋 Ítems reales y sus tasks</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-5">
-          {realItems.map((item) => {
-            const itemTasks = realTasks.filter((rt) => rt.real_item_id === item.id);
-            return (
-              <div key={item.id} className="border rounded-xl p-4 bg-accent/30">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div>
-                    <div className="font-semibold">{item.title}</div>
-                    {item.description && <p className="text-sm text-muted-foreground mt-1">{item.description}</p>}
-                  </div>
-                  <div className="flex flex-col items-end gap-1 shrink-0">
-                    {item.points && <Badge variant="secondary" className="text-xs">{item.points} pts</Badge>}
-                    {item.assignee && <span className="text-xs text-muted-foreground">{item.assignee.split(" ")[0]}</span>}
-                  </div>
-                </div>
-                {item.activated_at && (
-                  <div className="flex gap-2 mb-3">
-                    <Badge variant="outline" className="text-[10px]">Inicio: {item.activated_at}</Badge>
-                    {item.closed_at && <Badge variant="outline" className="text-[10px]">Cierre: {item.closed_at}</Badge>}
-                  </div>
-                )}
-                {/* Real tasks */}
-                {itemTasks.length > 0 && (
-                  <div className="mt-3 border-t pt-3">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                      Tasks reales ({itemTasks.length})
-                    </span>
-                    <div className="grid gap-1.5 mt-2">
-                      {itemTasks.map((rt) => (
-                        <div key={rt.id} className="flex items-center gap-2 bg-card rounded-lg px-3 py-2 text-sm">
-                          <span className="text-muted-foreground font-mono text-xs">#{rt.external_id}</span>
-                          <span className="flex-1">{rt.title}</span>
-                          {rt.description && <span className="text-xs text-muted-foreground truncate max-w-48">{rt.description}</span>}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </CardContent>
-      </Card>
-
       {/* Matching matrix (facilitator only) */}
       {isFacilitator && (
         <Card className="shadow-sm">
