@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { Room, Participant, Task, Review } from "@/types";
 
@@ -10,11 +10,7 @@ export function useRoom(code: string) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const fetchRoom = useCallback(async () => {
-    const { data } = await supabase.from("rooms").select().eq("code", code).single();
-    if (data) setRoom(data);
-  }, [code]);
+  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
   const fetchParticipants = useCallback(async (roomId: string) => {
     const { data } = await supabase.from("participants").select().eq("room_id", roomId);
@@ -32,10 +28,17 @@ export function useRoom(code: string) {
   }, []);
 
   useEffect(() => {
-    let channel: ReturnType<typeof supabase.channel> | null = null;
+    // Cleanup previous channel if any
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+
+    let cancelled = false;
 
     const init = async () => {
       const { data: roomData } = await supabase.from("rooms").select().eq("code", code).single();
+      if (cancelled) return;
       if (!roomData) { setLoading(false); return; }
       setRoom(roomData);
 
@@ -44,34 +47,43 @@ export function useRoom(code: string) {
         fetchTasks(roomData.id),
         fetchReviews(roomData.id),
       ]);
+      if (cancelled) return;
       setLoading(false);
 
-      // Create channel, attach all listeners, THEN subscribe
-      channel = supabase.channel(`room-${roomData.id}`);
+      // Create a unique channel name to avoid conflicts
+      const channelName = `room-${roomData.id}-${Date.now()}`;
+      const channel = supabase.channel(channelName);
 
-      channel
-        .on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomData.id}` },
-          (payload) => {
-            if (payload.eventType === "DELETE") { setRoom(null); }
-            else if (payload.new) { setRoom(payload.new as Room); }
-          }
-        )
-        .on("postgres_changes", { event: "*", schema: "public", table: "participants", filter: `room_id=eq.${roomData.id}` },
-          () => { fetchParticipants(roomData.id); }
-        )
-        .on("postgres_changes", { event: "*", schema: "public", table: "tasks", filter: `room_id=eq.${roomData.id}` },
-          () => { fetchTasks(roomData.id); }
-        )
-        .on("postgres_changes", { event: "*", schema: "public", table: "reviews" },
-          () => { fetchReviews(roomData.id); }
-        );
+      channel.on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomData.id}` },
+        (payload) => {
+          if (payload.eventType === "DELETE") { setRoom(null); }
+          else if (payload.new) { setRoom(payload.new as Room); }
+        }
+      );
+      channel.on("postgres_changes", { event: "*", schema: "public", table: "participants", filter: `room_id=eq.${roomData.id}` },
+        () => { fetchParticipants(roomData.id); }
+      );
+      channel.on("postgres_changes", { event: "*", schema: "public", table: "tasks", filter: `room_id=eq.${roomData.id}` },
+        () => { fetchTasks(roomData.id); }
+      );
+      channel.on("postgres_changes", { event: "*", schema: "public", table: "reviews" },
+        () => { fetchReviews(roomData.id); }
+      );
 
       channel.subscribe();
+      channelRef.current = channel;
     };
 
     init();
-    return () => { if (channel) supabase.removeChannel(channel); };
+
+    return () => {
+      cancelled = true;
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
   }, [code, fetchParticipants, fetchTasks, fetchReviews]);
 
-  return { room, participants, tasks, reviews, loading, refetch: fetchRoom };
+  return { room, participants, tasks, reviews, loading };
 }
