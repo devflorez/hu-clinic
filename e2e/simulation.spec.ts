@@ -94,26 +94,35 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
 
     // Wait for the CREATE_TASKS phase to be visible (realtime update)
     await page.locator("text=Backlog").waitFor({ state: "visible", timeout: 15000 });
+    await page.waitForTimeout(500);
 
-    for (const task of tasks) {
-      // Click new button - try both variants
-      const firstTaskBtn = page.locator("button", { hasText: "Crear primera tarea" });
-      const newBtn = page.locator("button", { hasText: "+ Nuevo" });
+    for (let t = 0; t < tasks.length; t++) {
+      const task = tasks[t];
 
-      if (await firstTaskBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await firstTaskBtn.click();
+      // For first task, might need "Crear primera tarea", otherwise "+ Nuevo"
+      if (t === 0) {
+        const firstTaskBtn = page.locator("button", { hasText: "Crear primera tarea" });
+        if (await firstTaskBtn.isVisible({ timeout: 1500 }).catch(() => false)) {
+          await firstTaskBtn.click();
+        } else {
+          await page.locator("button", { hasText: "+ Nuevo" }).click();
+        }
       } else {
-        await newBtn.click();
+        await page.locator("button", { hasText: "+ Nuevo" }).click();
       }
 
-      // Fill title
+      // Wait for form to appear
       const titleInput = page.locator('[data-testid="task-title-input"]');
-      await titleInput.waitFor({ state: "visible", timeout: 8000 });
+      await titleInput.waitFor({ state: "visible", timeout: 10000 });
       await titleInput.fill(task.title);
 
-      // Save without changing other fields (keep defaults)
-      await page.locator("button", { hasText: "Guardar work item" }).click();
-      await page.waitForTimeout(600);
+      // Submit form
+      const saveBtn = page.locator("button", { hasText: "Guardar work item" });
+      await saveBtn.waitFor({ state: "visible", timeout: 5000 });
+      await saveBtn.click();
+
+      // Wait for form to close (detail view appears)
+      await page.waitForTimeout(1000);
     }
     console.log(`   ✏️ ${PARTICIPANTS[i]} creó ${tasks.length} tareas`);
   }
