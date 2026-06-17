@@ -18,9 +18,6 @@ export function ReadHU({ room }: { room: Room }) {
             {room.story_points && (
               <Badge variant="secondary" className="text-sm">{room.story_points} puntos</Badge>
             )}
-            {room.assignee && (
-              <Badge variant="outline" className="text-sm">👤 {room.assignee}</Badge>
-            )}
             {room.activated_at && (
               <Badge variant="outline" className="text-sm">📅 Inicio: {room.activated_at}</Badge>
             )}

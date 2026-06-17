@@ -89,7 +89,6 @@ export function CreateTasks({ room, participantId }: { room: Room; participantId
             </div>
           )}
           <div className="flex flex-wrap gap-2">
-            {room.assignee && <Badge variant="outline" className="text-xs">👤 {room.assignee}</Badge>}
             {room.activated_at && <Badge variant="outline" className="text-xs">📅 {room.activated_at}</Badge>}
             {room.closed_at && <Badge variant="outline" className="text-xs">✅ {room.closed_at}</Badge>}
           </div>
