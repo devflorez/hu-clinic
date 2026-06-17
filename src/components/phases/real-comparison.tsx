@@ -125,27 +125,6 @@ export function RealComparison({ room, tasks, participants, isFacilitator, revie
         </Card>
       )}
 
-      {/* Summary for non-facilitators */}
-      {!isFacilitator && (
-        <Card className="shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base">📊 Resumen de comparación</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-5">
-            <div>
-              <h4 className="font-semibold text-sm text-green-700 mb-2">✅ Ítems cubiertos</h4>
-              {summary.covered.map((i) => <div key={i.id} className="text-sm ml-4 py-1">{i.title}</div>)}
-              {summary.covered.length === 0 && <p className="text-sm text-muted-foreground ml-4">Ninguno aún</p>}
-            </div>
-            <div>
-              <h4 className="font-semibold text-sm text-red-700 mb-2">❌ Ítems no identificados</h4>
-              {summary.uncovered.map((i) => <div key={i.id} className="text-sm ml-4 py-1">{i.title}</div>)}
-              {summary.uncovered.length === 0 && <p className="text-sm text-muted-foreground ml-4">¡Todos cubiertos!</p>}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Reveal: real tasks that were rated */}
       {(() => {
         const realTareas = tasks.filter((t) => t.is_from_real);
