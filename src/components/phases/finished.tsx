@@ -30,7 +30,7 @@ export function Finished() {
         </ol>
         <div className="bg-accent/50 rounded-xl p-5 mt-2">
           <p className="text-sm text-muted-foreground leading-relaxed">
-            💡 Usen estas reflexiones para mejorar la próxima descomposición de HU en su equipo.
+            💡 ¡Gracias por participar!
           </p>
         </div>
       </CardContent>
