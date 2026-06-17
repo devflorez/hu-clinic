@@ -176,21 +176,52 @@ test("Simulación completa con navegadores reales", async ({ browser }) => {
   console.log(`   ✅ Dashboard visible`);
 
   // === 7. REAL_COMPARISON ===
-  console.log(`⏭️ REAL_COMPARISON`);
+  console.log(`\n⏭️ REAL_COMPARISON`);
   await facilitatorPage.locator("button", { hasText: "🔗" }).click();
-  await facilitatorPage.waitForTimeout(2000);
+  await facilitatorPage.waitForTimeout(3000);
+
+  // Log real items coverage
+  const coveredText = await facilitatorPage.locator("text=Ítems cubiertos").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+  const partialText = await facilitatorPage.locator("text=Parcialmente").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+  const uncoveredText = await facilitatorPage.locator("text=No identificados").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+  const noMatchText = await facilitatorPage.locator("text=Tareas sin match").locator("..").locator("div.text-3xl").textContent().catch(() => "?");
+
+  console.log(`   📊 COMPARACIÓN CON ÍTEMS REALES:`);
+  console.log(`      Ítems cubiertos: ${coveredText}`);
+  console.log(`      Parcialmente: ${partialText}`);
+  console.log(`      No identificados: ${uncoveredText}`);
+  console.log(`      Tareas sin match: ${noMatchText}`);
+
+  // Log revealed real tasks if visible
+  const revealSection = facilitatorPage.locator("text=Revelación: Tareas que eran reales");
+  if (await revealSection.isVisible({ timeout: 2000 }).catch(() => false)) {
+    const realTaskCards = await facilitatorPage.locator("text=Tarea real").all();
+    console.log(`      🎭 Tareas reales reveladas: ${realTaskCards.length}`);
+  }
+
   console.log(`   ✅ Comparación visible`);
 
   // === 8. FINISHED ===
-  console.log(`⏭️ FINISHED`);
+  console.log(`\n⏭️ FINISHED`);
   await facilitatorPage.locator("button", { hasText: "🎉" }).click();
-  await facilitatorPage.waitForTimeout(1500);
+  await facilitatorPage.waitForTimeout(2000);
   await expect(facilitatorPage.locator("text=Dinámica finalizada")).toBeVisible({ timeout: 5000 });
 
-  console.log(`\n🎉 SIMULACIÓN COMPLETA`);
+  // Log closing questions
+  const questions = await facilitatorPage.locator("ol li, li").allTextContents().catch(() => []);
+  if (questions.length > 0) {
+    console.log(`   ❓ PREGUNTAS DE CIERRE:`);
+    questions.forEach((q) => console.log(`      • ${q.trim()}`));
+  }
+
+  console.log(`\n${"═".repeat(50)}`);
+  console.log(`🎉 SIMULACIÓN COMPLETA`);
+  console.log(`${"═".repeat(50)}`);
   console.log(`   Sala: ${roomCode}`);
   console.log(`   Participantes: ${PARTICIPANTS.length}`);
-  console.log(`   Tareas: ${TASKS_PER_PARTICIPANT.flat().length}\n`);
+  console.log(`   Tareas creadas: ${TASKS_PER_PARTICIPANT.flat().length}`);
+  console.log(`   URL: ${facilitatorPage.url()}`);
+  console.log(`${"═".repeat(50)}\n`);
 
   // Cleanup
   for (const page of participantPages) await page.context().close();
